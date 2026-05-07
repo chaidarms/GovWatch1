@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GovWatch - Chaidar Maulida Saputra</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Space+Grotesk:wght@700&display=swap');
+        
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #000; color: #fff; overflow-x: hidden; }
+        .font-headline { font-family: 'Space Grotesk', sans-serif; text-transform: uppercase; font-style: italic; font-weight: 700; letter-spacing: -0.05em; }
+
+        .filter-btn { border: 1px solid #333; transition: all 0.3s ease; cursor: pointer; }
+        .filter-btn.active { background: #fff; color: #000; border-color: #fff; }
+
+        .hero-card { position: relative; min-height: 500px; background: #050505; border: 1px solid #111; display: flex; flex-direction: column; justify-content: flex-end; padding: 3rem; overflow: hidden; transition: 0.5s; cursor: pointer; }
+        .hero-card:hover { border-color: #fff; box-shadow: 0 0 40px rgba(255,255,255,0.1); }
+        .hero-card::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, #000 25%, transparent 100%); z-index: 1; }
+        .news-title { font-size: 3rem; line-height: 0.9; z-index: 10; position: relative; }
+
+        .archive-item { border-bottom: 1px solid #111; transition: 0.3s; cursor: pointer; }
+        .archive-item:hover { background: #fff; color: #000; }
+        .archive-item:hover * { color: #000 !important; }
+
+        #details-modal { display: none; z-index: 9999; }
+        .shimmer { background: linear-gradient(90deg, #050505 25%, #111 50%, #050505 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    </style>
+</head>
+<body class="pb-20">
+
+    <header class="sticky top-0 bg-black/95 backdrop-blur-xl border-b border-white/10 z-[100]">
+        <div class="max-w-[1600px] mx-auto px-8 py-6 flex flex-col lg:flex-row justify-between items-center gap-8">
+            <div class="flex items-center gap-5">
+                <div class="h-12 w-12 bg-white flex items-center justify-center shadow-lg">
+                    <i class="fas fa-shield-alt text-black text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-black font-headline italic tracking-tighter leading-none">GovWatch</h1>
+                    <p class="text-[9px] font-bold text-white/30 uppercase tracking-[0.5em] mt-1">Lead Developer: C. Maulida Saputra</p>
+                </div>
+            </div>
+
+            <nav id="nav-filters" class="flex flex-wrap justify-center gap-2">
+                <button onclick="updateFeed('all', this)" class="filter-btn active px-5 py-2 text-[9px] font-black uppercase tracking-widest">Semua Isu</button>
+                <button onclick="updateFeed('hukum', this)" class="filter-btn px-5 py-2 text-[9px] font-black uppercase tracking-widest">Hukum</button>
+                <button onclick="updateFeed('ekonomi', this)" class="filter-btn px-5 py-2 text-[9px] font-black uppercase tracking-widest">Ekonomi</button>
+                <button onclick="updateFeed('geopolitik', this)" class="filter-btn px-5 py-2 text-[9px] font-black uppercase tracking-widest">Geopolitik</button>
+                <button onclick="updateFeed('nasional', this)" class="filter-btn px-5 py-2 text-[9px] font-black uppercase tracking-widest">Nasional</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-[1600px] mx-auto px-8 py-12">
+        <div id="headline-feed" class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-24">
+            <div class="shimmer h-[500px]"></div>
+            <div class="shimmer h-[500px]"></div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-16">
+            <div class="lg:col-span-4 sticky top-48 h-fit pb-10">
+                <h2 id="cat-label" class="text-xl font-black uppercase tracking-[0.5em] text-white italic border-l-4 border-white pl-6">Real-Time News</h2>
+                <p class="text-white/20 text-[10px] mt-6 leading-relaxed uppercase tracking-widest font-bold">Sinkronisasi otomatis dari jaringan berita terpercaya. Diperbarui setiap saat.</p>
+            </div>
+            <div id="archive-feed" class="lg:col-span-8 divide-y divide-white/5"></div>
+        </div>
+
+        <footer class="mt-40 pt-20 border-t border-white/5 flex flex-col items-center">
+            <h3 class="text-6xl md:text-8xl font-black font-headline italic mb-4 opacity-5 uppercase select-none">Chaidar Maulida Saputra</h3>
+            <p class="text-white/20 text-[10px] tracking-[0.5em] uppercase font-bold tracking-widest">FISIP Universitas Lampung &bull; 2026</p>
+        </footer>
+    </main>
+
+    <div id="details-modal" class="fixed inset-0 items-center justify-center p-6 bg-black/95 backdrop-blur-md">
+        <div class="bg-black border border-white/20 w-full max-w-4xl relative z-10 p-12 lg:p-20 shadow-2xl">
+            <button onclick="closeModal()" class="absolute top-10 right-10 text-white/40 hover:text-white text-4xl">&times;</button>
+            <h2 id="m-title" class="font-headline text-5xl mb-10 leading-tight italic"></h2>
+            <div class="h-1 w-20 bg-white mb-10"></div>
+            <a id="m-link" href="#" target="_blank" class="inline-block bg-white text-black py-5 px-10 font-black uppercase tracking-widest text-[10px] hover:invert transition">Buka Sumber Berita &rsaquo;</a>
+        </div>
+    </div>
+
+    <script>
+        const querySet = {
+            all: 'unila OR lampung OR geopolitik OR "politik nasional"',
+            hukum: '"isu hukum" OR "peradilan" OR "korupsi indonesia" OR "putusan pengadilan"',
+            ekonomi: '"ekonomi ri" OR "investasi lampung" OR "bisnis nasional" OR "pasar keuangan"',
+            geopolitik: '"hubungan internasional indonesia" OR "konflik global" OR "diplomasi asia"',
+            nasional: '"isu dpr" OR "kebijakan pemerintah" OR "isu politik nasional" OR "presiden"'
+        };
+
+        async function fetchIssues(category = 'all') {
+            const hFeed = document.getElementById('headline-feed');
+            const q = encodeURIComponent(querySet[category]);
+            const rssUrl = `https://news.google.com/rss/search?q=${q}&hl=id-ID&gl=ID&ceid=ID:id`;
+            const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
+
+            try {
+                const res = await fetch(apiUrl);
+                const data = await res.json();
+                if (data.status === 'ok') renderCards(data.items);
+            } catch (e) {
+                hFeed.innerHTML = '<p class="col-span-full text-center py-20 text-white/20 uppercase font-black tracking-widest">Sistem sibuk. Mohon refresh halaman.</p>';
+            }
+        }
+
+        function renderCards(items) {
+            const hFeed = document.getElementById('headline-feed');
+            const aFeed = document.getElementById('archive-feed');
+            hFeed.innerHTML = '';
+            aFeed.innerHTML = '';
+
+            items.forEach((item, index) => {
+                const date = new Date(item.pubDate).toLocaleDateString('id-ID', {day:'numeric', month:'short'});
+                const title = item.title.split(' - ')[0];
+                const source = item.author || "News Network";
+
+                if (index < 2) {
+                    hFeed.innerHTML += `
+                        <div class="hero-card group" onclick="openModal('${encodeURIComponent(title)}', '${item.link}')">
+                            <div class="relative z-10">
+                                <p class="text-[9px] font-black uppercase tracking-[0.3em] text-white/40 mb-6">${source} // ${date}</p>
+                                <h3 class="font-headline news-title">${title}</h3>
+                            </div>
+                        </div>`;
+                } else {
+                    aFeed.innerHTML += `
+                        <div class="archive-item p-10 flex justify-between items-center" onclick="openModal('${encodeURIComponent(title)}', '${item.link}')">
+                            <div>
+                                <p class="text-[9px] font-black uppercase tracking-[0.3em] text-white/30 mb-4">${source} // ${date}</p>
+                                <h3 class="text-xl font-bold uppercase tracking-tighter italic">${title}</h3>
+                            </div>
+                            <i class="fas fa-chevron-right text-xs opacity-20"></i>
+                        </div>`;
+                }
+            });
+        }
+
+        function updateFeed(cat, btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('cat-label').innerText = `${cat} News`;
+            document.getElementById('headline-feed').innerHTML = '<div class="shimmer h-[500px]"></div><div class="shimmer h-[500px]"></div>';
+            document.getElementById('archive-feed').innerHTML = '';
+            fetchIssues(cat);
+        }
+
+        function openModal(t, l) {
+            document.getElementById('m-title').innerText = decodeURIComponent(t);
+            document.getElementById('m-link').href = l;
+            document.getElementById('details-modal').style.display = 'flex';
+        }
+
+        function closeModal() { document.getElementById('details-modal').style.display = 'none'; }
+
+        fetchIssues('all');
+    </script>
+</body>
+</html>
