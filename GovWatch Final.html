@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GovWatch — Chaidar Maulida Saputra</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&family=DM+Serif+Display:italic@0;1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --ink: #0a0a0f;
+            --paper: #f5f0e8;
+            --accent: #c8102e;
+            --accent2: #1a3a6e;
+            --muted: #9a9490;
+            --line: #d8d2c8;
+            --gold: #b8960c;
+        }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--paper);
+            color: var(--ink);
+            font-family: 'DM Sans', sans-serif;
+            line-height: 1.6;
+        }
+
+        /* Ticker */
+        .ticker-wrap { background: var(--accent); overflow: hidden; border-bottom: 3px solid var(--ink); }
+        .ticker-inner { display: flex; white-space: nowrap; animation: ticker 40s linear infinite; }
+        .ticker-inner span { color: #fff; font-size: 10px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; padding: 10px 40px; }
+        @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+        /* Header */
+        header { background: var(--ink); position: sticky; top: 0; z-index: 100; border-bottom: 4px solid var(--accent); }
+        .header-top { max-width: 1400px; margin: 0 auto; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .logo-block h1 { font-family: 'Bebas Neue', sans-serif; font-size: 38px; color: #fff; letter-spacing: 2px; line-height: 1; }
+        .logo-block span { color: var(--accent); }
+        .logo-sub { font-size: 9px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-top: 5px; }
+        .header-date { color: var(--muted); font-size: 10px; text-transform: uppercase; text-align: right; }
+
+        /* Navigation */
+        .nav-filters { background: #111; display: flex; justify-content: center; overflow-x: auto; }
+        .filter-btn { padding: 12px 20px; color: #666; background: none; border: none; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
+        .filter-btn.active { color: #fff; border-bottom: 2px solid var(--accent); }
+
+        /* Main Content */
+        main { max-width: 1400px; margin: 0 auto; padding: 30px; display: grid; grid-template-columns: 1fr 300px; gap: 30px; }
+        .content-area { width: 100%; }
+        
+        .section-label { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+        .tag { background: var(--accent); color: #fff; font-size: 9px; padding: 4px 10px; font-weight: 800; text-transform: uppercase; }
+        .line { flex: 1; height: 1px; background: var(--line); }
+
+        /* Hero Layout */
+        .hero-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .hero-main { background: var(--ink); color: #fff; min-height: 400px; padding: 40px; display: flex; flex-direction: column; justify-content: flex-end; cursor: pointer; position: relative; overflow: hidden; }
+        .hero-main:hover { opacity: 0.9; }
+        .hero-title { font-family: 'DM Serif Display', serif; font-size: 32px; line-height: 1.1; margin-bottom: 15px; font-style: italic; }
+        .hero-side { background: #fff; border: 1px solid var(--line); padding: 25px; cursor: pointer; display: flex; flex-direction: column; justify-content: flex-end; }
+        .side-title { font-family: 'DM Serif Display', serif; font-size: 16px; margin-top: 10px; line-height: 1.3; }
+
+        .feed-grid { display: grid; grid-template-columns: 1fr; gap: 5px; }
+        .news-row { background: #fff; padding: 18px 25px; border: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; }
+        .news-row:hover { background: var(--ink); color: #fff; }
+
+        /* Sidebar Branding */
+        .about-card { background: var(--ink); color: #fff; padding: 30px; position: sticky; top: 120px; }
+        .about-card h3 { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: var(--accent); margin-bottom: 15px; }
+        .about-card p { font-size: 12px; opacity: 0.7; margin-bottom: 20px; }
+        .dev-info { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; }
+        .dev-label { font-size: 8px; text-transform: uppercase; color: var(--muted); letter-spacing: 1px; }
+        .dev-name { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: #fff; }
+
+        /* Modal */
+        #modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
+        #modal.open { display: flex; }
+        .modal-box { background: var(--paper); max-width: 600px; width: 100%; padding: 50px; position: relative; border-top: 5px solid var(--accent); }
+        .modal-close { position: absolute; top: 15px; right: 20px; cursor: pointer; font-size: 24px; }
+        .modal-btn { display: inline-block; background: var(--ink); color: #fff; padding: 12px 25px; text-decoration: none; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-top: 20px; }
+
+        footer { border-top: 3px solid var(--ink); padding: 40px 30px; text-align: center; margin-top: 50px; }
+        .footer-logo { font-family: 'Bebas Neue', sans-serif; font-size: 60px; color: var(--line); }
+
+        @media (max-width: 1000px) {
+            main { grid-template-columns: 1fr; }
+            .hero-grid { grid-template-columns: 1fr; }
+            .about-card { position: static; margin-top: 30px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ticker-wrap">
+        <div class="ticker-inner">
+            <span>GovWatch — Pemantau Isu Pemerintahan Indonesia</span>
+            <span>Created by Chaidar Maulida Saputra — FISIP UNILA 2026</span>
+            <span>Real-time Update — Hukum · Ekonomi · Geopolitik · Nasional</span>
+            <span>GovWatch — Pemantau Isu Pemerintahan Indonesia</span>
+        </div>
+    </div>
+
+    <header>
+        <div class="header-top">
+            <div class="logo-block">
+                <h1>Gov<span>Watch</span></h1>
+                <div class="logo-sub">Chaidar Maulida Saputra</div>
+            </div>
+            <div class="header-date" id="current-date"></div>
+        </div>
+        <nav class="nav-filters">
+            <button class="filter-btn active" onclick="switchCat('all', this)">◆ Semua Isu</button>
+            <button class="filter-btn" onclick="switchCat('hukum', this)">Hukum</button>
+            <button class="filter-btn" onclick="switchCat('ekonomi', this)">Ekonomi</button>
+            <button class="filter-btn" onclick="switchCat('geopolitik', this)">Geopolitik</button>
+        </nav>
+    </header>
+
+    <main>
+        <div class="content-area">
+            <div class="section-label">
+                <div class="tag">Headline Utama</div>
+                <div class="line"></div>
+                <span id="last-updated" style="font-size: 10px; color: var(--muted);">Syncing...</span>
+            </div>
+
+            <div id="hero-grid" class="hero-grid"></div>
+
+            <div class="section-label">
+                <div class="tag">Berita Terkini</div>
+                <div class="line"></div>
+            </div>
+
+            <div id="feed-grid" class="feed-grid"></div>
+        </div>
+
+        <aside>
+            <div class="about-card">
+                <h3>Tentang GovWatch</h3>
+                <p>Platform monitoring isu kritis pemerintahan Indonesia untuk kebutuhan analisis akademis mahasiswa FISIP Universitas Lampung.</p>
+                <div class="dev-info">
+                    <div class="dev-label">Developer / Researcher</div>
+                    <div class="dev-name">Chaidar Maulida Saputra</div>
+                    <div class="dev-label" style="margin-top:10px;">Institution</div>
+                    <div class="dev-name" style="font-size:14px;">FISIP Universitas Lampung</div>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <footer>
+        <div class="footer-logo">CHAIDAR M. SAPUTRA</div>
+        <p style="font-size: 10px; letter-spacing: 3px; color: var(--muted);">GOVWATCH 2026 — UNIVERSITAS LAMPUNG</p>
+    </footer>
+
+    <!-- MODAL -->
+    <div id="modal" onclick="if(event.target==this) closeModal()">
+        <div class="modal-box">
+            <div class="modal-close" onclick="closeModal()">×</div>
+            <p id="m-meta" style="font-size: 9px; color: var(--accent); font-weight: 800; text-transform: uppercase; letter-spacing: 1px;"></p>
+            <h2 id="m-title" style="font-family: 'DM Serif Display', serif; margin: 15px 0; font-style: italic;"></h2>
+            <p style="font-size: 13px; color: #555; border-left: 2px solid var(--line); padding-left: 15px;">Akses berita lengkap melalui tautan resmi di bawah untuk validasi data lebih lanjut.</p>
+            <a id="m-link" href="#" target="_blank" class="modal-btn">Buka Sumber Asli</a>
+        </div>
+    </div>
+
+    <script>
+        let currentNews = [];
+        const queries = {
+            all: 'pemerintah indonesia OR politik OR DPR',
+            hukum: 'hukum indonesia OR korupsi OR kpk',
+            ekonomi: 'ekonomi investasi indonesia OR rupiah',
+            geopolitik: 'hubungan luar negeri indonesia OR asean'
+        };
+
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+        async function fetchNews(cat) {
+            const grid = document.getElementById('hero-grid');
+            const feed = document.getElementById('feed-grid');
+            const status = document.getElementById('last-updated');
+
+            try {
+                const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(queries[cat])}&hl=id-ID&gl=ID&ceid=ID:id`;
+                const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`);
+                const data = await response.json();
+
+                if (data.status === 'ok' && data.items.length > 0) {
+                    currentNews = data.items;
+                    renderNews();
+                    status.textContent = 'Update: ' + new Date().toLocaleTimeString('id-ID');
+                } else {
+                    throw new Error('Data Empty');
+                }
+            } catch (e) {
+                grid.innerHTML = '<p style="padding:20px; color:var(--muted);">Gagal memuat feed. Coba refresh halaman.</p>';
+                console.error(e);
+            }
+        }
+
+        function renderNews() {
+            const grid = document.getElementById('hero-grid');
+            const feed = document.getElementById('feed-grid');
+            
+            grid.innerHTML = '';
+            feed.innerHTML = '';
+
+            currentNews.forEach((item, i) => {
+                const title = item.title.split(' - ')[0];
+                const date = new Date(item.pubDate).toLocaleDateString('id-ID', { day:'numeric', month:'short' });
+
+                if (i === 0) {
+                    grid.innerHTML += `
+                        <div class="hero-main" onclick="openModal(${i})">
+                            <p style="font-size:10px; color:var(--accent); font-weight:bold; letter-spacing:2px;">TOP STORY</p>
+                            <h2 class="hero-title">${title}</h2>
+                            <p style="font-size:11px; opacity:0.6; text-transform:uppercase;">${item.author} · ${date}</p>
+                        </div>`;
+                } else if (i < 3) {
+                    grid.innerHTML += `
+                        <div class="hero-side" onclick="openModal(${i})">
+                            <span style="font-size:9px; color:var(--accent); font-weight:bold; text-transform:uppercase;">${item.author}</span>
+                            <h3 class="side-title">${title}</h3>
+                            <p style="font-size:9px; color:var(--muted); margin-top:5px;">${date}</p>
+                        </div>`;
+                } else if (i < 12) {
+                    feed.innerHTML += `
+                        <div class="news-row" onclick="openModal(${i})">
+                            <span style="font-size:13px; font-weight:500; padding-right:20px;">${title}</span>
+                            <div style="text-align:right; min-width:80px;">
+                                <span style="font-size:10px; color:var(--muted);">${date}</span>
+                            </div>
+                        </div>`;
+                }
+            });
+        }
+
+        function openModal(index) {
+            const item = currentNews[index];
+            document.getElementById('m-title').textContent = item.title.split(' - ')[0];
+            document.getElementById('m-meta').textContent = `${item.author} | ${item.pubDate}`;
+            document.getElementById('m-link').href = item.link;
+            document.getElementById('modal').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        function switchCat(cat, btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            fetchNews(cat);
+        }
+
+        fetchNews('all');
+    </script>
+</body>
+</html>
